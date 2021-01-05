@@ -12,7 +12,7 @@ const { v4: uuidv4 } = require('uuid');
 const meetingTable = {};
 
 // Use local host for application server
-const host = '127.0.0.1:8080';
+const host = '0.0.0.0:8080';
 
 // Load the contents of the web application to be used as the index page
 const indexPage = fs.readFileSync(`dist/${process.env.npm_config_app || 'meetingV2'}.html`);
@@ -30,7 +30,7 @@ http.createServer({}, async (request, response) => {
   log(`${request.method} ${request.url} BEGIN`);
   try {
     // Enable HTTP compression
-    compression({})(request, response, () => {});
+    compression({})(request, response, () => { });
     const requestUrl = url.parse(request.url, true);
     if (request.method === 'GET' && requestUrl.pathname === '/') {
       // Return the contents of the index page

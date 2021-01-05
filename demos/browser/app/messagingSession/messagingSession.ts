@@ -146,6 +146,7 @@ export class DemoMessagingSessionApp implements MessagingSessionObserver {
       }
     );
     const json = await response.json();
+    console.log(json)
     if (json.error) {
       throw new Error(`Server error: ${json.error}`);
     }

@@ -6,6 +6,7 @@ import RealtimeAttendeePositionInFrame from './RealtimeAttendeePositionInFrame';
 import RealtimeController from './RealtimeController';
 import RealtimeState from './RealtimeState';
 import RealtimeVolumeIndicator from './RealtimeVolumeIndicator';
+import type VolumeIndicatorCallback from './VolumeIndicatorCallback';
 
 /**
  * [[DefaultRealtimeController]] is written to adhere to the following tenets to
@@ -241,16 +242,7 @@ export default class DefaultRealtimeController implements RealtimeController {
 
   // Volume Indicators
 
-  realtimeSubscribeToVolumeIndicator(
-    attendeeId: string,
-    callback: (
-      attendeeId: string,
-      volume: number | null,
-      muted: boolean | null,
-      signalStrength: number | null,
-      externalUserId?: string
-    ) => void
-  ): void {
+  realtimeSubscribeToVolumeIndicator(attendeeId: string, callback: VolumeIndicatorCallback): void {
     try {
       if (!this.state.volumeIndicatorCallbacks.hasOwnProperty(attendeeId)) {
         this.state.volumeIndicatorCallbacks[attendeeId] = [];
@@ -267,33 +259,22 @@ export default class DefaultRealtimeController implements RealtimeController {
       this.onError(e);
     }
   }
+
   realtimeUnsubscribeFromVolumeIndicator(
     attendeeId: string,
-    callback?: (
-      attendeeId: string,
-      volume: number | null,
-      muted: boolean | null,
-      signalStrength: number | null,
-      externalUserId?: string
-    ) => void
+    callback?: VolumeIndicatorCallback
   ): void {
-    if (!callback) {
-      try {
-        delete this.state.volumeIndicatorCallbacks[attendeeId];
-      } catch (e) {
-        this.onError(e);
-      }
-    } else {
-      try {
-        if(this.state.volumeIndicatorCallbacks[attendeeId]) {
-          const idx = this.state.volumeIndicatorCallbacks[attendeeId].indexOf(callback);
-          if (idx) {
-            this.state.volumeIndicatorCallbacks[attendeeId].splice(idx, 1);
-          }
+    try {
+      if (callback) {
+        const index = this.state.volumeIndicatorCallbacks[attendeeId].indexOf(callback);
+        if (index !== -1) {
+          this.state.volumeIndicatorCallbacks[attendeeId].splice(index, 1);
         }
-      } catch (e) {
-        console.log('cannot unsubscribe volume indicator', e);
+      } else {
+        delete this.state.volumeIndicatorCallbacks[attendeeId];
       }
+    } catch (e) {
+      this.onError(e);
     }
   }
 

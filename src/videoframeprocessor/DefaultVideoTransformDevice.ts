@@ -44,6 +44,13 @@ export default class DefaultVideoTransformDevice
   }
 
   /**
+   * setter for `processors`.
+   */
+  public setProcessors(processors: VideoFrameProcessor[]): void {
+    this.pipe.processors = processors;
+  }  
+
+  /**
    * `chooseNewInnerDevice` preserves the inner pipeline and processing state and switches
    * the inner device. Since the pipeline and processors are shared with the new transform device
    * only one transform device can be used.

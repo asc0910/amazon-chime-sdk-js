@@ -284,8 +284,15 @@ export default class DefaultRealtimeController implements RealtimeController {
         this.onError(e);
       }
     } else {
-      if(this.state.volumeIndicatorCallbacks[attendeeId]) {
-        this.state.volumeIndicatorCallbacks[attendeeId] = this.state.volumeIndicatorCallbacks[attendeeId].filter(f => f !== callback);
+      try {
+        if(this.state.volumeIndicatorCallbacks[attendeeId]) {
+          const idx = this.state.volumeIndicatorCallbacks[attendeeId].indexOf(callback);
+          if (idx) {
+            this.state.volumeIndicatorCallbacks[attendeeId].splice(idx, 1);
+          }
+        }
+      } catch (e) {
+        console.log('cannot unsubscribe volume indicator', e);
       }
     }
   }

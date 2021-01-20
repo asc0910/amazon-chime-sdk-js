@@ -54,13 +54,22 @@ export default class DefaultContentShareController
     if (!stream) {
       return;
     }
+    const oldStream = this.mediaStreamBroker.mediaStream;
     this.mediaStreamBroker.mediaStream = stream;
     for (let i = 0; i < this.mediaStreamBroker.mediaStream.getTracks().length; i++) {
       this.mediaStreamBroker.mediaStream.getTracks()[i].addEventListener('ended', () => {
         this.stopContentShare();
       });
     }
-    this.contentAudioVideo.start();
+    if (oldStream && oldStream.active && this.contentAudioVideo.replaceLocalVideo) {
+      // optimized method exists, a negotiation can be avoided
+      await this.contentAudioVideo.replaceLocalVideo();
+      for (let i = 0; i < oldStream.getTracks().length; i++) {
+        oldStream.getTracks()[i].stop();
+      }
+    } else {
+      this.contentAudioVideo.start();
+    }
     if (this.mediaStreamBroker.mediaStream.getVideoTracks().length > 0) {
       this.contentAudioVideo.videoTileController.startLocalVideoTile();
     }
